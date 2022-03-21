@@ -15,6 +15,10 @@ def create_database(name: str):
 def close_database(con: sqlite3.Connection):
     con.close()
 
+def add_coffee(name: str, roasting_degree: str, roasting_date: str, 
+    description: str, price_per_kilo: int, batch_ID: int, roastery_ID: int):
+    cursor.execute(f"INSERT INTO Coffee (CoffeeName, RoastingDegree, RoastingDate, Description, PricePerKilo, BatchID, RoasteryID) VALUES ({name}, {roasting_degree}, {roasting_date}, {description}, {price_per_kilo}, {batch_ID}, {roastery_ID})")
+
 def get_all_coffees(cursor: sqlite3.Cursor):
     cursor.execute("SELECT * FROM COFFEE")
 
