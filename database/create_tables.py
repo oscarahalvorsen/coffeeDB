@@ -1,10 +1,4 @@
 import sqlite3
-import string
-
-def createDatabase(name: string):
-    con = sqlite3.connect(name)
-    cursor = con.cursor()
-    return con, cursor
 
 def createTables(cursor: sqlite3.Cursor):
     createUserTable(cursor)
@@ -45,7 +39,7 @@ def createReviewTable(cursor: sqlite3.Cursor):
     (
         UserID INTEGER REFERENCES User(UserID) ON DELETE SET NULL ON UPDATE CASCADE, 
         CoffeeID INTEGER REFERENCES Coffee(CoffeeID) ON DELETE CASCADE ON UPDATE CASCADE,
-        Date DATE NOT NULL,
+        Date TEXT NOT NULL,
         Note TEXT,
         Score INTEGER CHECK (SCORE >= 0 AND SCORE <= 10),
         PRIMARY KEY (UserID, CoffeeID)
@@ -59,7 +53,7 @@ def createCoffeeTable(cursor: sqlite3.Cursor):
         CoffeeID INTEGER PRIMARY KEY,
         CoffeeName TEXT,
         RoastingDegree TEXT NOT NULL CHECK (RoastingDegree = "light" OR RoastingDegree = "medium" or RoastingDegree = "dark"),
-        RoastingDate DATE NOT NULL,
+        RoastingDate TEXT NOT NULL,
         Description TEXT,
         PricePerKilo INTEGER CHECK (PricePerKilo > 0),
         BatchID INTEGER REFERENCES Batch(BatchID) ON DELETE SET NULL ON UPDATE CASCADE,
