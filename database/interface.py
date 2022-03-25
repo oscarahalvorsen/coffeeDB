@@ -1,5 +1,5 @@
 import sqlite3
-from .database import create_database
+from database import create_database
 
 def main():
     choice = get_choice()
@@ -44,12 +44,24 @@ def user_story_1():
     pass
 
 
-def user_story_2(con: sqlite3.Connection, cursor: sqlite3.Cursor):
-    cursor.execute('''''')
+def user_story_2(cursor: sqlite3.Cursor) -> None:
+    user_coffee_tasted = cursor.execute('''SELECT User.FullName, count(*) as CoffeesTasted FROM User NATURAL JOIN Review 
+    NATURAL JOIN Coffee GROUP BY User.UserID ORDER BY CoffeesTasted DESC''').fetchall()
+    print("\nCoffees tasted | User")
+    print("---------------|-----------------")
+    for user_coffee in user_coffee_tasted:
+        print(str(user_coffee[1]) + " " * (15 - len(str(user_coffee[1]))) + "| " + user_coffee[0])
+    print()
 
 
-def user_story_3():
-    pass
+def user_story_3(cursor: sqlite3.Cursor) -> None:
+    coffee_value = cursor.execute('''SELECT Coffee.CoffeeName, AVG(Review.Score) AS AverageReview, Coffee.PricePerKilo FROM Coffee JOIN Review on Coffee.CoffeeID == Review.CoffeeID 
+    GROUP BY Coffee.CoffeeID ORDER BY AverageReview DESC''').fetchall()
+    print("\n Avg. Score | Name of the Coffee | Price (NOK per kg)")
+    print("------------|--------------------|------------------")
+    for value in coffee_value:
+        print(str(value[1]) + " " * (12 - len(str(value[1]))) + "| " + value[0] + " " * (19 - len(str(value[0]))) + "| " + str(value[2]))
+    print()
 
 
 def user_story_4():
@@ -61,4 +73,5 @@ def user_story_5():
 
 
 if __name__ == "__main__":
-    main()
+    con, cursor = create_database("test.db")
+    user_story_3(cursor)

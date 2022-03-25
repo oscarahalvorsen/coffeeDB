@@ -2,7 +2,7 @@ from os import curdir
 import sqlite3
 import create_tables
 
-def create_database(name: str):
+def create_database(name: str) -> tuple[sqlite3.Connection, sqlite3.Cursor]:
 
     try:
         con = sqlite3.connect(name)
@@ -13,11 +13,11 @@ def create_database(name: str):
         return con, cursor
 
     except Exception as e:
-        print(e)
+        pass
 
     return con, cursor
 
-def close_database(con: sqlite3.Connection):
+def close_database(con: sqlite3.Connection) -> None:
     con.close()
 
 
@@ -148,19 +148,21 @@ def get_all_from_table(cursor: sqlite3.Cursor, table: str):
 
 if __name__ == "__main__":
     con, cursor = create_database("test.db")
-    # add_user(con, cursor, "123", "Ola Nordmann", "ola@nordmann.no")
+    # add_review(con, cursor, 2, 2, "25.03.2022", "Tastes like shit", 1)
+    # add_user(con, cursor, "123", "Oskar Jorgensen", "oskar@gmail.com")
     # add_region(con, cursor, "Santa Ana", "El Salvador")
-    regions = get_all_from_table(cursor, "Region")
-    my_region = [x for x in regions if x[1] == "Santa Ana" and x[2] == "El Salvador"][0]
-    my_region_id = my_region[0]
+    # regions = get_all_from_table(cursor, "Region")
+    # my_region = [x for x in regions if x[1] == "Santa Ana" and x[2] == "El Salvador"][0]
+    # my_region_id = my_region[0]
     # add_farm(con, cursor, 1500, "Nombre de Dios", my_region_id)
-    # add_bean(con, cursor, "Natural Bourbon")
-    # add_bean_from_farm(con, cursor, "Natural Bourbon", 1)
-    # add_refining_method(con, cursor, "washed", "rinse the beans in cold water for 20 minutes")
-    # add_batch(con ,cursor, 2021, 8, "washed", 1)
-    # add_batch_contains_bean(con, cursor, 1, "Natural Bourbon")
+    # add_bean(con, cursor, "Aromatic Arabica")
+    # add_bean_from_farm(con, cursor, "Aromatic Arabica", 1)
+    # add_refining_method(con, cursor, "natural", "let beans sit in natural sunlight for 48 hours")
+    # add_batch(con ,cursor, 2021, 8, "natural", 1)
+    # add_batch_contains_bean(con, cursor, 2, "Natural Bourbon")
     # add_region(con, cursor, "Trondheim", "Norge")
     # add_roastery(con, cursor, "Jacobsen & Svart", 2)
-    add_coffee(con, cursor, "Vinterkaffe 2022", "light", "20.01.2022", 
-    "A tasty and complex coffee for polar nights", 600, 1, 1)
+    # add_coffee(con, cursor, "Sommerkaffe 2022", "medium", "12.12.2021", 
+    # "A tasty and complex coffee for polar nights", 600, 2, 1)
+
     
