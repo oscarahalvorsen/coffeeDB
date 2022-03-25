@@ -18,7 +18,7 @@ def createUserTable(cursor: sqlite3.Cursor):
     cursor.execute('''
     CREATE TABLE User
     (
-        UserID INTEGER PRIMARY KEY, 
+        UserID INTEGER PRIMARY KEY REFERENCES Email(UserID) ON DELETE CASCADE ON UPDATE CASCADE, 
         Password TEXT NOT NULL,
         FullName TEXT NOT NULL
     );

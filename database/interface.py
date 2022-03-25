@@ -1,16 +1,8 @@
 import sqlite3
 from datetime import date, datetime
 
-from database import create_database, add_review
+from database import create_database, add_review, add_user
 
-def main():
-    choice = get_choice()
-    if(choice == "v"):
-        # View coffees
-        print("Viewing")
-    elif(choice == "r"):
-        # Review a coffee
-        print("Reviewing")
 
 def get_choice():
     choice = input("Would you like to [v]iew coffee(s) or leave a [r]eview? ").lower()
@@ -19,10 +11,8 @@ def get_choice():
         choice = input("Would you like to [v]iew coffee(s) or leave a [r]eview? ").lower()
     return choice
 
-def reviewCoffee():
-    coffee_name = input("What is the name of the coffee you wish to review? ")
 
-def user_stories(cursor: sqlite3.Cursor, con: sqlite3.Connection):
+def user_stories(con: sqlite3.Connection, cursor: sqlite3.Cursor):
     user_story = int(input("What user story would you like to see [1-5]? "))
     while(user_story < 1 or user_story > 5):
         user_story = int(input("What user story would you like to see [1-5]? "))
@@ -55,6 +45,14 @@ def user_story_1(con: sqlite3.Connection, cursor: sqlite3.Cursor):
     while(choice != "l" and choice != "r"):
         print("Wrong input")
         choice = input("Please [l]ogin or [r]egister: ")
+    user_ID = -1
+    if choice == "r":
+        print("Please register")
+        full_name = input("Name: ")
+        mail = input("Email: ")
+        pword = input("Password: ")
+        user_ID = add_user(con, cursor, pword, full_name, mail)[0]
+        print(user_ID)
     if choice == "l":
         print("Please login")
         mail = input("Email: ")
@@ -63,12 +61,10 @@ def user_story_1(con: sqlite3.Connection, cursor: sqlite3.Cursor):
             mail = input("Email: ")
             if(mail == "q"):
                 return 0
-        pword = ""
-        user_ID = -1
         for user in user_list:
             if(user[0] == mail):
-                pword = user[1]
                 user_ID = user[2]
+                print(user_ID)
         user_pword = input("Password: ")
         while(user_pword not in [x[1] for x in user_list] and user_pword != "q"):
             print("Wrong password! Please try again or quit using [q]")
@@ -76,39 +72,43 @@ def user_story_1(con: sqlite3.Connection, cursor: sqlite3.Cursor):
             if(user_pword == "q"):
                 return 0
         print("Login successful!")
-        review_choice = input("Would you like to leave a [r]eview or [q]uit? ")
-        while(review_choice != "r" and review_choice != "q"):
-            if(review_choice == "q"):
-                return 0
-            print("Wrong input")
-            review_choice = input("Would you like to leave a [r]eview or [q]uit? ")
-        coffee_name = input("What is the name of the coffee (leave empty to show all)? ")
-        coffees = cursor.execute('''
-        SELECT Coffee.CoffeeName, Roastery.Name, Coffee.RoastingDate, Coffee.CoffeeID FROM Coffee NATURAL JOIN Roastery WHERE Coffee.CoffeeName LIKE '%''' + coffee_name + '''%'
-        ''').fetchall()
-        if(len(coffees) == 0):
-            print("No coffees matched your search.")
+    review_choice = input("Would you like to leave a [r]eview or [q]uit? ")
+    if(review_choice == "q"):
+        return 0
+    while(review_choice != "r" and review_choice != "q"):
+        if(review_choice == "q"):
             return 0
-        print()
-        for i in range(len(coffees)):
-            print(f"[{i+1}] {coffees[i][0]}(roasted {coffees[i][2]}) by {coffees[i][1]}")
-        print()
-        coffee_choice = input(f"Select using a number (1-{len(coffees)}): ")
-        coffee_choice = coffees[int(coffee_choice) - 1]
-        note = input("Write what you thought about the coffee: ")
-        score = input("Leave a score (1-10): ")
-        while True:
-            try:
-                score = int(score)
-                if(score > 0 and score <= 10):
-                    break
-                else:
-                    print("Score must be a number from 1 to 10!")
-                    score = input("Leave a score (1-10): ")
-            except:
+        print("Wrong input")
+        review_choice = input("Would you like to leave a [r]eview or [q]uit? ")
+    coffee_name = input("What is the name of the coffee (leave empty to show all)? ")
+    coffees = cursor.execute('''
+    SELECT Coffee.CoffeeName, Roastery.Name, Coffee.RoastingDate, Coffee.CoffeeID 
+    FROM Coffee NATURAL JOIN Roastery 
+    WHERE Coffee.CoffeeName LIKE '%''' + coffee_name + '''%'
+    ''').fetchall()
+    if(len(coffees) == 0):
+        print("No coffees matched your search.")
+        return 0
+    print()
+    for i in range(len(coffees)):
+        print(f"[{i+1}] {coffees[i][0]}(roasted {coffees[i][2]}) by {coffees[i][1]}")
+    print()
+    coffee_choice = input(f"Select using a number (1-{len(coffees)}): ")
+    coffee_choice = coffees[int(coffee_choice) - 1]
+    note = input("Write what you thought about the coffee: ")
+    score = input("Leave a score (1-10): ")
+    while True:
+        try:
+            score = int(score)
+            if(score > 0 and score <= 10):
+                break
+            else:
                 print("Score must be a number from 1 to 10!")
                 score = input("Leave a score (1-10): ")
-        add_review(con, cursor, user_ID, coffee_choice[3], datetime.now().strftime("%d.%m.%Y"), note, score)
+        except:
+            print("Score must be a number from 1 to 10!")
+            score = input("Leave a score (1-10): ")
+    add_review(con, cursor, user_ID, coffee_choice[3], datetime.now().strftime("%d.%m.%Y"), note, score)
         
 
 def user_story_2(cursor: sqlite3.Cursor) -> None:
@@ -159,13 +159,12 @@ def user_story_4(cursor: sqlite3.Cursor) -> None:
 
 
 def user_story_5(cursor: sqlite3.Cursor):
-    coffee_not_washed = cursor.execute(
-    '''
+    coffee_not_washed = cursor.execute('''
     SELECT Roastery.Name, Coffee.CoffeeName 
     FROM Coffee 
     NATURAL JOIN Roastery JOIN Batch ON Coffee.BatchID == Batch.BatchID JOIN Farm ON Batch.FarmID == Farm.FarmID 
     JOIN Region ON Farm.RegionID == Region.RegionID  
-    WHERE Batch.MethodName NOT LIKE "washed" AND Region.Country == "Colombia" OR Region.Country == "Rwanda";
+    WHERE Batch.MethodName NOT LIKE "%washed%" AND Region.Country == "Colombia" OR Region.Country == "Rwanda";
     ''').fetchall()
 
     print("\nRoastery            | Coffee")

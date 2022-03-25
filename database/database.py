@@ -29,13 +29,13 @@ def add_user(con: sqlite3.Connection, cursor: sqlite3.Cursor, password: str, ful
         return(e)
     try:
         cursor.execute('''SELECT UserID from Email WHERE Email == ?''', (email,))
-        user_ID = cursor.fetchone()
+        user_ID = cursor.fetchall()[0]
         cursor.execute('''INSERT INTO User (UserID, Password, Fullname) VALUES (?, ?, ?)''', (user_ID[0], password, full_name))
         con.commit()
     except Exception as e:
         print("Could not insert into User table")
         return(e)
-    return 1
+    return user_ID
 
 
 def add_review(con: sqlite3.Connection, cursor: sqlite3.Cursor, user_ID: int, coffee_ID: int, date: str, 
@@ -46,6 +46,7 @@ def add_review(con: sqlite3.Connection, cursor: sqlite3.Cursor, user_ID: int, co
         con.commit()
     except Exception as e:
         print("Could not insert into Coffee table")
+        print(e)
         return(e)
     return 1
 
