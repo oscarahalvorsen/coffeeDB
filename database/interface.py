@@ -1,7 +1,7 @@
 import sqlite3
-from datetime import date
+from datetime import date, datetime
 
-from database import create_database
+from database import create_database, add_review
 
 def main():
     choice = get_choice()
@@ -22,27 +22,32 @@ def get_choice():
 def reviewCoffee():
     coffee_name = input("What is the name of the coffee you wish to review? ")
 
-def user_stories():
+def user_stories(cursor: sqlite3.Cursor, con: sqlite3.Connection):
     user_story = int(input("What user story would you like to see [1-5]? "))
     while(user_story < 1 or user_story > 5):
         user_story = int(input("What user story would you like to see [1-5]? "))
-    execute_story(user_story)
+    execute_story(user_story, cursor, con)
 
-def execute_story(story: int):
+def execute_story(story: int, cursor: sqlite3.Cursor, con: sqlite3.Connection):
     create_database("my.db")
     match story:
         case 1:
-            user_story_1()
+            print("This story allows you to leave a review for an existing coffee\n")
+            user_story_1(cursor, con)
         case 2:
-            user_story_2()
+            print("This story shows which users have tasted the most coffees this year\n")
+            user_story_2(cursor)
         case 3:
-            user_story_3()
+            print("This story shows the coffees with the highest rating per price\n")
+            user_story_3(cursor)
         case 4:
-            user_story_4()
+            print("This story shows the coffees which have been describes as floral, either by users or the roastery\n")
+            user_story_4(cursor)
         case 5:
-            user_story_5()
+            print("This story shows coffees with beans from Rwanda or Colombia, that have not been washed")
+            user_story_5(cursor)
 
-def user_story_1(cursor: sqlite3.Cursor):
+def user_story_1(con: sqlite3.Connection, cursor: sqlite3.Cursor):
     user_list = cursor.execute('''
     SELECT Email.Email, User.Password, User.UserID FROM User NATURAL JOIN Email;
     ''').fetchall()
@@ -71,8 +76,40 @@ def user_story_1(cursor: sqlite3.Cursor):
             if(user_pword == "q"):
                 return 0
         print("Login successful!")
-
-
+        review_choice = input("Would you like to leave a [r]eview or [q]uit? ")
+        while(review_choice != "r" and review_choice != "q"):
+            if(review_choice == "q"):
+                return 0
+            print("Wrong input")
+            review_choice = input("Would you like to leave a [r]eview or [q]uit? ")
+        coffee_name = input("What is the name of the coffee (leave empty to show all)? ")
+        coffees = cursor.execute('''
+        SELECT Coffee.CoffeeName, Roastery.Name, Coffee.RoastingDate, Coffee.CoffeeID FROM Coffee NATURAL JOIN Roastery WHERE Coffee.CoffeeName LIKE '%''' + coffee_name + '''%'
+        ''').fetchall()
+        if(len(coffees) == 0):
+            print("No coffees matched your search.")
+            return 0
+        print()
+        for i in range(len(coffees)):
+            print(f"[{i+1}] {coffees[i][0]}(roasted {coffees[i][2]}) by {coffees[i][1]}")
+        print()
+        coffee_choice = input(f"Select using a number (1-{len(coffees)}): ")
+        coffee_choice = coffees[int(coffee_choice) - 1]
+        note = input("Write what you thought about the coffee: ")
+        score = input("Leave a score (1-10): ")
+        while True:
+            try:
+                score = int(score)
+                if(score > 0 and score <= 10):
+                    break
+                else:
+                    print("Score must be a number from 1 to 10!")
+                    score = input("Leave a score (1-10): ")
+            except:
+                print("Score must be a number from 1 to 10!")
+                score = input("Leave a score (1-10): ")
+        add_review(con, cursor, user_ID, coffee_choice[3], datetime.now().strftime("%d.%m.%Y"), note, score)
+        
 
 def user_story_2(cursor: sqlite3.Cursor) -> None:
     year = date.today().year
@@ -110,7 +147,7 @@ def user_story_4(cursor: sqlite3.Cursor) -> None:
     coffee_floral = cursor.execute('''
     SELECT Roastery.Name, Coffee.CoffeeName 
     FROM Coffee NATURAL JOIN Roastery JOIN Review ON Coffee.CoffeeID == Review.CoffeeID 
-    WHERE Review.Note LIKE '%a%' OR Coffee.Description LIKE '%a%'
+    WHERE Review.Note LIKE '%floral%' OR Coffee.Description LIKE '%floral%'
     GROUP BY Coffee.CoffeeID;
     ''').fetchall()
 
@@ -140,4 +177,4 @@ def user_story_5(cursor: sqlite3.Cursor):
 
 if __name__ == "__main__":
     con, cursor = create_database("test.db")
-    user_story_1(cursor)
+    user_stories(con, cursor)
