@@ -148,21 +148,20 @@ def get_all_from_table(cursor: sqlite3.Cursor, table: str):
 
 if __name__ == "__main__":
     con, cursor = create_database("test.db")
-    # add_review(con, cursor, 2, 2, "25.03.2022", "Tastes like shit", 1)
-    # add_user(con, cursor, "123", "Oskar Jorgensen", "oskar@gmail.com")
-    # add_region(con, cursor, "Santa Ana", "El Salvador")
+    # add_review(con, cursor, 3, 2, "25.03.2022", "Beatiful floral tastes", 9)
+    # add_user(con, cursor, "123", "Oscar Halvorsen", "oscar@gmail.com")
+    # add_region(con, cursor, "Bogota", "Colombia")
     # regions = get_all_from_table(cursor, "Region")
     # my_region = [x for x in regions if x[1] == "Santa Ana" and x[2] == "El Salvador"][0]
     # my_region_id = my_region[0]
-    # add_farm(con, cursor, 1500, "Nombre de Dios", my_region_id)
+    # add_farm(con, cursor, 1669, "Casa de Hierbos", 3)
     # add_bean(con, cursor, "Aromatic Arabica")
     # add_bean_from_farm(con, cursor, "Aromatic Arabica", 1)
     # add_refining_method(con, cursor, "natural", "let beans sit in natural sunlight for 48 hours")
-    # add_batch(con ,cursor, 2021, 8, "natural", 1)
-    # add_batch_contains_bean(con, cursor, 2, "Natural Bourbon")
+    # add_batch(con ,cursor, 2021, 8, "natural", 2)
+    # add_batch_contains_bean(con, cursor, 3, "Aromatic Arabica")
     # add_region(con, cursor, "Trondheim", "Norge")
-    # add_roastery(con, cursor, "Jacobsen & Svart", 2)
-    # add_coffee(con, cursor, "Sommerkaffe 2022", "medium", "12.12.2021", 
-    # "A tasty and complex coffee for polar nights", 600, 2, 1)
+    # add_roastery(con, cursor, "Gamla Hage", 4)
+    # add_coffee(con, cursor, "Beany Heaven", "dark", "13.07.2019", "Floral, yet not too sweet", 990, 3, 2)
 
     
