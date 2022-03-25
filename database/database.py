@@ -94,7 +94,7 @@ def add_batch_contains_bean(con: sqlite3.Connection, cursor: sqlite3.Cursor, bat
 def add_bean(con: sqlite3.Connection, cursor: sqlite3.Cursor, bean: str):
     try:
         cursor.execute('''INSERT INTO Bean (Species) 
-        VALUES (?);''', (bean))
+        VALUES (?);''', [bean])
         con.commit()
     except Exception as e:
         print("Could not insert into Bean table")
@@ -131,7 +131,7 @@ def add_region(con: sqlite3.Connection, cursor: sqlite3.Cursor, name: str, count
         return(e)
     return 1
 
-def add_refining_methos(con: sqlite3.Connection, cursor: sqlite3.Cursor, method_name: str, desc: str):
+def add_refining_method(con: sqlite3.Connection, cursor: sqlite3.Cursor, method_name: str, desc: str):
     try:
         cursor.execute('''INSERT INTO RefiningMethod(MethodName, Description)
         VALUES (?, ?);''', (method_name, desc))
@@ -153,8 +153,14 @@ if __name__ == "__main__":
     regions = get_all_from_table(cursor, "Region")
     my_region = [x for x in regions if x[1] == "Santa Ana" and x[2] == "El Salvador"][0]
     my_region_id = my_region[0]
-    add_farm(con, cursor, 1500, "Nombre de Dios", my_region_id)
-    add_bean(con, cursor, "Natural Bourbon")
-    # add_coffee(con, cursor, "Vinterkaffe 2022", "light", "20.01.2022", 
-    # "A tasty and complex coffee for polar nights", 20, 1, 1)
-    print(get_all_from_table(cursor, "Coffee"))
+    # add_farm(con, cursor, 1500, "Nombre de Dios", my_region_id)
+    # add_bean(con, cursor, "Natural Bourbon")
+    # add_bean_from_farm(con, cursor, "Natural Bourbon", 1)
+    # add_refining_method(con, cursor, "washed", "rinse the beans in cold water for 20 minutes")
+    # add_batch(con ,cursor, 2021, 8, "washed", 1)
+    # add_batch_contains_bean(con, cursor, 1, "Natural Bourbon")
+    # add_region(con, cursor, "Trondheim", "Norge")
+    # add_roastery(con, cursor, "Jacobsen & Svart", 2)
+    add_coffee(con, cursor, "Vinterkaffe 2022", "light", "20.01.2022", 
+    "A tasty and complex coffee for polar nights", 600, 1, 1)
+    

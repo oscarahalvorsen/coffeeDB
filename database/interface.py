@@ -1,3 +1,4 @@
+import sqlite3
 from .database import create_database
 
 def main():
@@ -27,8 +28,36 @@ def user_stories():
 
 def execute_story(story: int):
     create_database("my.db")
-    if(story == 1):
-        pass
+    match story:
+        case 1:
+            user_story_1()
+        case 2:
+            user_story_2()
+        case 3:
+            user_story_3()
+        case 4:
+            user_story_4()
+        case 5:
+            user_story_5()
+
+def user_story_1():
+    pass
+
+
+def user_story_2(con: sqlite3.Connection, cursor: sqlite3.Cursor):
+    cursor.execute('''''')
+
+
+def user_story_3():
+    pass
+
+
+def user_story_4():
+    pass
+
+
+def user_story_5():
+    pass
 
 
 if __name__ == "__main__":
