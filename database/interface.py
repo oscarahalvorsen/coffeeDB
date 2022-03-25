@@ -46,7 +46,7 @@ def user_story_1():
 
 def user_story_2(cursor: sqlite3.Cursor) -> None:
     user_coffee_tasted = cursor.execute('''SELECT User.FullName, count(*) as CoffeesTasted FROM User NATURAL JOIN Review 
-    NATURAL JOIN Coffee GROUP BY User.UserID ORDER BY CoffeesTasted DESC''').fetchall()
+    NATURAL JOIN Coffee WHERE Review.Date LIKE '%2022' GROUP BY User.UserID ORDER BY CoffeesTasted DESC''').fetchall()
     print("\nCoffees tasted | User")
     print("---------------|-----------------")
     for user_coffee in user_coffee_tasted:
@@ -55,12 +55,12 @@ def user_story_2(cursor: sqlite3.Cursor) -> None:
 
 
 def user_story_3(cursor: sqlite3.Cursor) -> None:
-    coffee_value = cursor.execute('''SELECT Coffee.CoffeeName, AVG(Review.Score) AS AverageReview, Coffee.PricePerKilo FROM Coffee JOIN Review on Coffee.CoffeeID == Review.CoffeeID 
-    GROUP BY Coffee.CoffeeID ORDER BY AverageReview DESC''').fetchall()
-    print("\n Avg. Score | Name of the Coffee | Price (NOK per kg)")
-    print("------------|--------------------|------------------")
+    coffee_value = cursor.execute('''SELECT Coffee.CoffeeName, AVG(Review.Score) AS AverageReview, Coffee.PricePerKilo, Roastery.Name FROM Coffee JOIN Review on Coffee.CoffeeID == Review.CoffeeID 
+    JOIN Roastery ON Coffee.RoasteryID == Roastery.RoasteryID GROUP BY Coffee.CoffeeID ORDER BY AverageReview DESC''').fetchall()
+    print("\n Avg. Score | Name of the Coffee | Price | Roastery")
+    print("------------|--------------------|-------|--------------")
     for value in coffee_value:
-        print(str(value[1]) + " " * (12 - len(str(value[1]))) + "| " + value[0] + " " * (19 - len(str(value[0]))) + "| " + str(value[2]))
+        print(str(value[1]) + " " * (12 - len(str(value[1]))) + "| " + value[0] + " " * (19 - len(str(value[0]))) + "| " + str(value[2]) + " " * (6 - len(str(value[2]))) + "| " + value[3])
     print()
 
 
